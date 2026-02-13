@@ -32,6 +32,7 @@ const execAsync = promisify(exec);
 const HOME = process.env.HOME ?? "";
 const GHOSTTY_CONFIG = `${HOME}/.config/ghostty/config`;
 const GHOSTTY_THEMES_DIR = `${HOME}/.config/ghostty/themes`;
+const PAIR_STATE_FILE = `${HOME}/.pi/agent/theme-pair-state.json`;
 
 interface ThemePair {
 	dark: string;
@@ -214,6 +215,20 @@ async function exists(path: string): Promise<boolean> {
 	}
 }
 
+async function loadPersistedPair(): Promise<string | null> {
+	try {
+		const data = JSON.parse(await readFile(PAIR_STATE_FILE, "utf-8"));
+		return data?.pair && THEME_PAIRS[data.pair] ? data.pair : null;
+	} catch {
+		return null;
+	}
+}
+
+async function persistPair(pair: string): Promise<void> {
+	await mkdir(dirname(PAIR_STATE_FILE), { recursive: true });
+	await writeFile(PAIR_STATE_FILE, JSON.stringify({ pair }), "utf-8");
+}
+
 async function installGhosttyThemes(): Promise<void> {
 	if (!(await exists(`${HOME}/.config/ghostty`))) return; // Ghostty not installed
 
@@ -281,14 +296,10 @@ export default function (pi: ExtensionAPI) {
 		// Install Ghostty themes if needed (idempotent, skips existing files)
 		await installGhosttyThemes();
 
-		// Restore persisted pair from session entries
-		for (const entry of ctx.sessionManager.getEntries()) {
-			if (entry.type === "custom" && entry.customType === "auto-theme-pair") {
-				const savedPair = (entry.data as { pair: string })?.pair;
-				if (savedPair && THEME_PAIRS[savedPair]) {
-					currentPair = savedPair;
-				}
-			}
+		// Restore persisted pair from state file
+		const savedPair = await loadPersistedPair();
+		if (savedPair) {
+			currentPair = savedPair;
 		}
 
 		await applyTheme(ctx);
@@ -329,7 +340,7 @@ export default function (pi: ExtensionAPI) {
 
 			currentPair = name;
 			currentAppliedTheme = ""; // Force re-apply
-			pi.appendEntry("auto-theme-pair", { pair: currentPair });
+			await persistPair(currentPair);
 
 			await applyTheme(ctx);
 			await updateGhosttyTheme(THEME_PAIRS[name]);

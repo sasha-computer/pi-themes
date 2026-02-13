@@ -1,16 +1,42 @@
-# pi-themes
+<p align="center">
+  <img src="assets/hero.png" alt="pi-themes" width="200" />
+</p>
 
-Auto-switching dark/light themes for [pi](https://github.com/badlogic/pi-mono) + [Ghostty](https://ghostty.org), with matching palettes across both.
+<h1 align="center">pi-themes</h1>
 
-Three theme pairs, each with a dark and light variant:
+<p align="center">
+  Matching dark/light themes for pi and Ghostty that follow your system appearance.
+</p>
+
+<p align="center">
+  <a href="#install">Install</a> ·
+  <a href="#how-does-it-work">How does it work?</a> ·
+  <a href="#usage">Usage</a> ·
+  <a href="#setup">Setup</a>
+</p>
+
+## Why pi-themes?
+
+Your terminal and your coding agent should look like they belong together. And when you flip your Mac to dark mode at night, both should follow without you touching anything.
+
+pi-themes ships three matched palettes (Catppuccin, Everforest, High Contrast) where pi's TUI and Ghostty's terminal colors use the exact same hex values. The extension polls macOS appearance and switches automatically.
+
+## How does it work?
+
+<p align="center">
+  <img src="demo.gif" alt="pi-themes demo" width="800" />
+</p>
+
+- **Three theme pairs**, each with a dark and light variant
+- **Auto dark/light switching** by polling macOS system appearance every 2 seconds
+- **Ghostty sync** rewrites the Ghostty config and triggers a reload when you change pairs
+- **Custom Ghostty themes** installed automatically on first run, matching pi's palette exactly
 
 | Pair | Dark | Light |
 |------|------|-------|
-| **Catppuccin** | Mocha | Latte |
-| **Everforest** | Dark (medium contrast) | Light (medium contrast) |
-| **High Contrast** | Pure black, saturated accents | Pure white, max contrast |
-
-Pi and Ghostty use the same hex values, so your terminal background, ANSI colors, syntax highlighting, and pi's UI all match.
+| Catppuccin | Mocha | Latte |
+| Everforest | Dark (medium) | Light (medium) |
+| High Contrast | Pure black | Pure white |
 
 ## Install
 
@@ -18,7 +44,7 @@ Pi and Ghostty use the same hex values, so your terminal background, ANSI colors
 pi install git:github.com/sasha-computer/pi-themes
 ```
 
-Or try it without installing:
+Or try it first:
 
 ```bash
 pi -e git:github.com/sasha-computer/pi-themes
@@ -26,14 +52,16 @@ pi -e git:github.com/sasha-computer/pi-themes
 
 ## Setup
 
-Your Ghostty config (`~/.config/ghostty/config`) needs these two lines for auto dark/light switching:
+For Ghostty sync, your `~/.config/ghostty/config` needs two lines:
 
 ```
 theme = light:Catppuccin Latte Sync,dark:Catppuccin Mocha Sync
 window-theme = auto
 ```
 
-The extension installs the custom Ghostty theme files to `~/.config/ghostty/themes/` automatically on first run.
+The extension drops matching Ghostty theme files into `~/.config/ghostty/themes/` on first run. No manual setup.
+
+If you don't use Ghostty, that's fine. The pi themes work standalone.
 
 ## Usage
 
@@ -53,24 +81,22 @@ Switch pairs:
 /theme-pair high-contrast
 ```
 
-This updates both pi and Ghostty instantly. The system appearance (dark/light) is polled every 2 seconds, so flipping macOS appearance auto-switches both.
-
-## How it works
-
-- **Pi themes** (6 JSON files in `themes/`) define all 51 color tokens for pi's TUI
-- **Ghostty themes** (embedded in the extension) use the same palette hex values for terminal colors
-- **The extension** polls `osascript` for macOS dark mode, switches the pi theme, and on pair change rewrites the `theme = ...` line in Ghostty's config then triggers a reload via AppleScript
+Both pi and Ghostty update instantly. Flip macOS appearance and both follow within 2 seconds.
 
 ## Palettes
 
-All colors sourced from the official repos:
+Colors sourced from official repos:
 
-- Catppuccin: [catppuccin/palette](https://github.com/catppuccin/palette) v1.7.1
-- Everforest: [sainnhe/everforest](https://github.com/sainnhe/everforest) palette.md (medium contrast)
-- High Contrast: custom, designed for maximum readability
+- **Catppuccin**: [catppuccin/palette](https://github.com/catppuccin/palette) v1.7.1
+- **Everforest**: [sainnhe/everforest](https://github.com/sainnhe/everforest) medium contrast
+- **High Contrast**: custom, max readability
 
 ## Requirements
 
-- macOS (uses `osascript` for appearance detection and Ghostty reload)
-- [Ghostty](https://ghostty.org) (optional, pi themes work standalone)
+- macOS (uses `osascript` for appearance detection)
 - [pi](https://github.com/badlogic/pi-mono)
+- [Ghostty](https://ghostty.org) (optional)
+
+## License
+
+MIT
